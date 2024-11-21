@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oohel IA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a192f 0%, #112240 100%);
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        nav {
+            position: fixed;
+            width: 100%;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(10, 25, 47, 0.95);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            letter-spacing: 1px;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+        }
+
+        .get-started {
+            padding: 8px 20px;
+            border: 2px solid #64ffda;
+            border-radius: 4px;
+            color: #64ffda;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .get-started:hover {
+            background: rgba(100, 255, 218, 0.1);
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 0 20px;
+            z-index: 2;
+        }
+
+        .title-container {
+            text-align: center;
+        }
+
+        .title-ia {
+            font-size: 300px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #64ffda, #40c9ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        .title-oohel {
+            font-size: 150px;
+			font-weight: 600;
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            opacity: 0;
+            animation: fadeIn 0.5s forwards 0.2s;
+        }
+
+        .subtitle {
+            font-size: 32px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 30px;
+            max-width: 600px;
+            text-align: center;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards 0.4s;
+        }
+
+        /* Canvas para la red neuronal */
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Secci�n de caracter�sticas */
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            padding: 100px 20px;
+            background: #112240;
+        }
+
+        .feature-card {
+            text-align: center;
+            max-width: 250px;
+            background: #0a192f;
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .feature-card img {
+            width: 80px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 24px;
+            color: #64ffda;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Tabs (secciones individuales) */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            background: #112240;
+            padding: 20px 0;
+            position: sticky;
+            top: 80px;
+            z-index: 999;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            color: #64ffda;
+            cursor: pointer;
+            font-size: 16px;
+            border: none;
+            background: transparent;
+            outline: none;
+            transition: background 0.3s ease;
+            margin: 0 10px;
+            position: relative;
+        }
+
+        .tab:hover, .tab.active {
+            background: rgba(100, 255, 218, 0.1);
+            border-radius: 4px;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 50px;
+            text-align: center;
+            background: #0a192f;
+            animation: fadeInContent 0.5s ease forwards;
+        }
+
+        .tab-content.active {
+            display: block;
+            margin-bottom: 50px;
+        }
+
+        .tab-content h2 {
+            font-size: 28px;
+            color: #64ffda;
+            margin-bottom: 20px;
+        }
+
+        .tab-content p {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 20px;
+        }
+
+        .tab-content img {
+            width: 80px;
+            margin-bottom: 20px;
+        }
+
+        .tab-content ul {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+            text-align: left;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .tab-content ul li {
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .tab-content ul li:before {
+            content: "?";
+            margin-right: 10px;
+            color: #64ffda;
+        }
+
+        /* Estrellas fugaces - Forma y animaci�n */
+        .star {
+            position: absolute;
+            background: linear-gradient(45deg, #00ffab, #00b3b3); /* Verde y azul */
+            clip-path: polygon(
+                50% 0%,
+                70% 30%,
+                100% 50%,
+                70% 70%,
+                50% 100%,
+                30% 70%,
+                0% 50%,
+                30% 30%
+            );
+            opacity: 0;
+            animation: explosion 0.4s ease-out forwards; /* Animaci�n m�s r�pida y expansi�n moderada */
+        }
+
+        /* Tama�os peque�os de las estrellas */
+        .star.small {
+            width: 6px;
+            height: 6px;
+        }
+
+        .star.medium {
+            width: 10px;
+            height: 10px;
+        }
+
+        .star.large {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Animaci�n de dispersi�n aleatoria */
+        @keyframes explosion {
+            0% {
+                opacity: 1;
+                transform: scale(1) translate(0, 0);
+            }
+            50% {
+                opacity: 0.6;
+                transform: scale(1.3) translate(var(--x), var(--y)); /* Expansi�n moderada */
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.5) translate(var(--x), var(--y));
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInContent {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="network"></canvas>
+    <nav>
+        <div class="nav-links">
+            <a href="#">HOME</a>
+            <a href="#">SERVICIOS</a>
+            <a href="#">SOLUCIONES</a>
+            <a href="#">CONTACTO</a>
+        </div>
+        <a href="#" class="get-started">EMPEZAR</a>
+    </nav>
+    <div class="hero">
+        <div class="title-container">
+            <h1 class="title-ia"><img src="https://img.icons8.com/dotty/500/64ffda/brain.png" style='width:230px' alt="Memoria">IA</h1>
+            <div class="title-oohel">Oohel</div>
+            <p class="subtitle">Transformando el futuro de los negocios con inteligencia artificial avanzada.</p>
+        </div>
+    </div>
+
+    <!-- Secci�n de caracter�sticas -->
+    <section class="features">
+        <div class="feature-card">
+            <img src="https://img.icons8.com/dotty/80/64ffda/graph.png" alt="An�lisis">
+            <h3>Análisis</h3>
+            <p>Detecta patrones clave para optimizar decisiones estrat�gicas.</p>
+        </div>
+        <div class="feature-card">
+            <img src="https://img.icons8.com/dotty/80/64ffda/brain.png" alt="Memoria">
+            <h3>Memoria</h3>
+            <p>Almacena datos críticos para una mejor toma de decisiones.</p>
+        </div>
+        <div class="feature-card">
+            <img src="https://img.icons8.com/dotty/80/64ffda/rocket.png" alt="Innovaci�n">
+            <h3>Innovación</h3>
+            <p>Impulsa tu empresa con tecnologías emergentes de IA.</p>
+        </div>
+    </section>
+
+    <!-- Tabs para las soluciones -->
+    <div class="tabs">
+        <button class="tab active" data-target="analysis">Análisis IA</button>
+        <button class="tab" data-target="chatbots">Chatbots</button>
+        <button class="tab" data-target="vision">Visión IA</button>
+        <button class="tab" data-target="voice">Reconocimiento de voz</button>
+    </div>
+
+    <!-- Contenido de las tabs -->
+    <div class="tab-content active" id="analysis">
+        <section style="max-width: 800px; margin: auto; font-family: Arial, sans-serif; line-height: 1.6;">
+    <p style="color: white">La inteligencia artificial (IA) es una herramienta clave para transformar grandes volúmenes de datos en información útil. Sus capacidades permiten optimizar procesos, anticipar tendencias y tomar decisiones estratégicas con mayor precisión.</p>
+
+    <h3 style="color: #64ffda;">Beneficios clave</h3>
+    <ul style="list-style-type: disc; margin-left: 20px;">
+        <li><strong>Anticipación de riesgos:</strong> Detecta problemas antes de que ocurran, reduciendo interrupciones.</li>
+        <li><strong>Reducción de costos:</strong> Optimiza procesos y minimiza desperdicios.</li>
+        <li><strong>Toma de decisiones informada:</strong> Proporciona análisis basados en datos concretos.</li>
+    </ul>
+
+    <h3 style="color: #64ffda;">Aplicaciones principales</h3>
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+        <div style="background: #2A9D8F; padding: 10px; border-radius: 8px;">
+            <strong>Análisis predictivo</strong>
+            <p>Anticipa tendencias de mercado y demanda futura para una mejor planificación.</p>
+        </div>
+        <div style="background: #2A9D8F; padding: 10px; border-radius: 8px;">
+            <strong>Optimización de procesos</strong>
+            <p>Mejora la eficiencia operativa y logística, como planificación de rutas.</p>
+        </div>
+        <div style="background: #2A9D8F; padding: 10px; border-radius: 8px;">
+            <strong>Generación automática de reportes</strong>
+            <p>Crea informes detallados en cuestión de segundos.</p>
+        </div>
+        <div style="background: #2A9D8F; padding: 10px; border-radius: 8px;">
+            <strong>Mantenimiento predictivo</strong>
+            <p>Detecta fallas en equipos antes de que ocurran para programar reparaciones.</p>
+        </div>
+    </div>
+
+    <h3 style="color: #64ffda;">Ejemplos prácticos</h3>
+    <ol style="margin-left: 20px;">
+        <li><strong>Gestión de inventarios:</strong> Evita faltantes o excesos, optimizando recursos.</li>
+        <li><strong>Personalización:</strong> Adapta servicios según las necesidades del cliente.</li>
+        <li><strong>Análisis de sostenibilidad:</strong> Reduce el impacto ambiental al mejorar procesos.</li>
+    </ol>
+
+    <p style="text-align: center; margin-top: 20px; color: white; font-style: italic">La IA es el motor de un futuro más eficiente y competitivo.</p>
+</section>
+
+    </div>
+
+    <div class="tab-content" id="chatbots">
+        <h2>Chatbots</h2>
+        <p>Implementa asistentes virtuales inteligentes que responden en tiempo real y mejoran la experiencia del cliente.</p>
+        <ul>
+            <li>Integración en redes sociales y sitios web.</li>
+            <li>Automatización de respuestas frecuentes.</li>
+            <li>Aprendizaje continuo para mejorar interacciones.</li>
+        </ul>
+    </div>
+
+    <div class="tab-content" id="vision">
+        <h2>Visión IA</h2>
+        <p>Procesa imágenes y videos para identificar objetos, personas y escenarios con precisión avanzada.</p>
+        <ul>
+            <li>Detección facial y de emociones.</li>
+            <li>Reconocimiento de productos y etiquetas.</li>
+            <li>Monitoreo en tiempo real para seguridad.</li>
+        </ul>
+    </div>
+
+    <div class="tab-content" id="voice">
+        <h2>Reconocimiento de voz</h2>
+        <p>Convierte comandos hablados en acciones concretas, mejorando la interacci�n humana con tecnolog�a.</p>
+        <ul>
+            <li>Transcripción automática de audio.</li>
+            <li>Control por voz para dispositivos IoT.</li>
+            <li>Procesamiento en múltiples idiomas.</li>
+        </ul>
+    </div>
+
+    <script>
+		// Red neuronal (animaci�n)
+        const canvas = document.getElementById('network');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const nodes = [];
+        const maxNodes = 50;
+
+        for (let i = 0; i < maxNodes; i++) {
+            nodes.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 2,
+                vy: (Math.random() - 0.5) * 2,
+                radius: 3,
+            });
+        }
+
+        function drawNodes() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (const node of nodes) {
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#64ffda';
+                ctx.fill();
+            }
+        }
+
+        function connectNodes() {
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const dx = nodes[i].x - nodes[j].x;
+                    const dy = nodes[i].y - nodes[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 150) {
+                        ctx.beginPath();
+                        ctx.moveTo(nodes[i].x, nodes[i].y);
+                        ctx.lineTo(nodes[j].x, nodes[j].y);
+                        ctx.strokeStyle = `rgba(100, 255, 218, ${1 - distance / 150})`;
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function updateNodes() {
+            for (const node of nodes) {
+                node.x += node.vx;
+                node.y += node.vy;
+
+                if (node.x < 0 || node.x > canvas.width) node.vx *= -1;
+                if (node.y < 0 || node.y > canvas.height) node.vy *= -1;
+            }
+        }
+
+        function animate() {
+            drawNodes();
+            connectNodes();
+            updateNodes();
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Tabs
+        const tabs = document.querySelectorAll('.tab');
+        const contents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+
+                tab.classList.add('active');
+                document.getElementById(tab.getAttribute('data-target')).classList.add('active');
+
+                // Animaci�n de estrellas dentro del bot�n donde se hace clic
+                const rect = tab.getBoundingClientRect();
+                const sparkle1 = document.createElement('div');
+                sparkle1.className = 'star medium one';
+                sparkle1.style.left = `${e.clientX - rect.left - 10}px`;
+                sparkle1.style.top = `${e.clientY - rect.top - 10}px`;
+                sparkle1.style.setProperty('--x', `${Math.random() * 40 - 20}px`); // Aleatorio
+                sparkle1.style.setProperty('--y', `${Math.random() * 40 - 20}px`); // Aleatorio
+                tab.appendChild(sparkle1);
+
+                const sparkle2 = document.createElement('div');
+                sparkle2.className = 'star small two';
+                sparkle2.style.left = `${e.clientX - rect.left - 5}px`;
+                sparkle2.style.top = `${e.clientY - rect.top - 5}px`;
+                sparkle2.style.setProperty('--x', `${Math.random() * 40 - 20}px`);
+                sparkle2.style.setProperty('--y', `${Math.random() * 40 - 20}px`);
+                tab.appendChild(sparkle2);
+
+                const sparkle3 = document.createElement('div');
+                sparkle3.className = 'star large three';
+                sparkle3.style.left = `${e.clientX - rect.left}px`;
+                sparkle3.style.top = `${e.clientY - rect.top}px`;
+                sparkle3.style.setProperty('--x', `${Math.random() * 40 - 20}px`);
+                sparkle3.style.setProperty('--y', `${Math.random() * 40 - 20}px`);
+                tab.appendChild(sparkle3);
+
+                const sparkle4 = document.createElement('div');
+                sparkle4.className = 'star small four';
+                sparkle4.style.left = `${e.clientX - rect.left + 5}px`;
+                sparkle4.style.top = `${e.clientY - rect.top + 5}px`;
+                sparkle4.style.setProperty('--x', `${Math.random() * 40 - 20}px`);
+                sparkle4.style.setProperty('--y', `${Math.random() * 40 - 20}px`);
+                tab.appendChild(sparkle4);
+
+                // Eliminar estrellas despu�s de la animaci�n
+                setTimeout(() => {
+                    sparkle1.remove();
+                    sparkle2.remove();
+                    sparkle3.remove();
+                    sparkle4.remove();
+                }, 800); // Animaci�n m�s r�pida
+            });
+        });
+    </script>
+</body>
+</html>
